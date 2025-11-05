@@ -1,8 +1,10 @@
 specVersion: 1.3.0
 indexerHints:
   prune: auto
+
 schema:
   file: ./schema.graphql
+
 dataSources:
   - kind: ethereum
     name: UBIScheme
@@ -16,11 +18,17 @@ dataSources:
       apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
-        - UBIClaimed
+        - Claim
+        - User
+        - UserDay
+        - DailyClaimStat
+        - GlobalTotals
       abis:
         - name: UBIScheme
           file: ./abis/UBIScheme.json
       eventHandlers:
         - event: UBIClaimed(indexed address,uint256)
           handler: handleUBIClaimed
-      file: ./src/ubi-scheme.ts
+        - event: UBICalculated(uint256,uint256,uint256)
+          handler: handleUBICalculated
+      file: ./src/mapping.ts

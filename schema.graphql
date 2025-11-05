@@ -1,8 +1,51 @@
-type UBIClaimed @entity(immutable: true) {
-  id: Bytes!
-  claimer: Bytes! # address
-  amount: BigInt! # uint256
+type Claim @entity(immutable: true) {
+  id: ID!                 # txHash-logIndex
+  claimer: Bytes!
+  amount: BigInt!
   blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
+  timestamp: BigInt!
+  txHash: Bytes!
+  dayId: String!          # numeric day (UTC epochDays as string)
+  dayISO: String!         # kept as numeric day string for now; convert in BI tool
+}
+
+type User @entity(immutable: false) {
+  id: Bytes!              # address
+  firstClaimDay: String!  # dayISO of first claim
+  lastClaimTimestamp: BigInt!
+  totalClaims: BigInt!
+  totalClaimedAmount: BigInt!
+}
+
+type UserDay @entity(immutable: false) {
+  id: ID!                 # ${dayId}-${user}
+  dayId: String!
+  dayISO: String!
+  user: Bytes!
+  amount: BigInt!         # total claimed by this user on this day
+}
+
+type DailyClaimStat @entity(immutable: false) {
+  id: ID!                 # dayId
+  dayISO: String!
+  dayStart: BigInt!
+  claimCount: BigInt!
+  dailyUniqueClaimers: BigInt!
+  newUsers: BigInt!
+  amountSum: BigInt!
+
+  # cumulatives for easy area charts
+  cumulativeClaims: BigInt!
+  cumulativeDistributed: BigInt!
+  cumulativeUniqueUsers: BigInt!
+
+  # per-user quota for that day (from UBICalculated); nullable if not emitted
+  dailyUbi: BigInt
+}
+
+type GlobalTotals @entity(immutable: false) {
+  id: ID!                 # "global"
+  totalClaims: BigInt!
+  totalDistributed: BigInt!
+  totalUniqueUsers: BigInt!
 }
